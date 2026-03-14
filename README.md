@@ -73,8 +73,8 @@ phonepe-insights/
 | Layer | Technology |
 |-------|-----------|
 | Data Source | [PhonePe Pulse GitHub](https://github.com/PhonePe/pulse) — JSON files |
-| ETL | Python 3.x · `git` · `json` · `mysql-connector-python` |
-| Storage | MySQL / PostgreSQL |
+| ETL | Python 3.x · `git` · `json` · `sqlalchemy` · `psycopg2-binary` · `pandas` |
+| Storage | PostgreSQL |
 | SQL Analytics | MySQL — CTEs, Window Functions (LAG, RANK, FIRST_VALUE) |
 | Dashboard | Streamlit · Plotly Express · Plotly Graph Objects |
 | Visualization | 15+ chart types — line, bar, heatmap, scatter, treemap, funnel, pie, dual-axis |
@@ -111,7 +111,7 @@ Aggregated_insurance     Map_insurance            Top_insurance
 ### Prerequisites
 
 - Python 3.8+
-- MySQL 8.0+ (or PostgreSQL)
+- PostgreSQL 13+
 - Git
 
 ### 1. Clone this repository
@@ -124,19 +124,19 @@ cd phonepe-insights
 ### 2. Install Python dependencies
 
 ```bash
-pip install streamlit plotly pandas numpy mysql-connector-python
+pip install streamlit plotly pandas numpy sqlalchemy psycopg2-binary
 ```
 
 ### 3. Configure database credentials
 
-Open `extract_load.py` and update the `DB_CONFIG` dictionary at the top:
+Open `extract_load.py` and update the connection variables at the top:
 
 ```python
 DB_CONFIG = {
     "host":     "localhost",
     "user":     "root",
     "password": "YOUR_PASSWORD_HERE",   # ← update this
-    "database": "phonepe_pulse"
+    "database": "phonepe_pulse"   # must already exist in PostgreSQL
 }
 ```
 
@@ -152,7 +152,7 @@ python extract_load.py
 
 **What it does:**
 1. Clones `https://github.com/PhonePe/pulse.git` into `./pulse/` (or pulls if already exists)
-2. Creates the `phonepe_pulse` database and all 9 tables
+2. Creates the `phonepe_pulse` database (if it doesn't exist) and all 9 tables
 3. Parses JSON files from `pulse/data/aggregated/`, `pulse/data/map/`, `pulse/data/top/`
 4. Loads all records using batch inserts with `ON DUPLICATE KEY UPDATE`
 
